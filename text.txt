@@ -1,0 +1,22 @@
+MODIFICATIONS BY METRO:
+
+1. run.pyw:
+   - Replaced `multiprocessing` approach with `subprocess.Popen` plus a dispatch mechanism.
+   - Using `creationflags=0x08000000` (HIDE_CONSOLE) to ensure NO extra terminal windows appear.
+   - Added logic to check for arguments (`--run-gui`, `--run-agent`, `--run-voice`).
+   - If no arguments are present, it launches the 3 components as subprocesses with the hidden flag.
+   - If arguments are present, it runs the specific component function.
+   - This prevents the "multiplying/loop" issue when compiled, while keeping terminals hidden.
+
+2. voicecontrol.py:
+   - Refactored main execution into `run_voice()`.
+   - Allows clean import and execution by `run.pyw`.
+
+3. agent.py:
+   - Refactored main execution into `run_agent()`.
+   - Forces `console` mode for LiveKit compatibility.
+   - Allows clean import and execution by `run.pyw`.
+
+4. gui.py:
+   - Restored the main animation circle (as requested "not the big circle in center").
+   - Removed the border around the Settings button (removed `border: 2px solid...` and `border-radius`).

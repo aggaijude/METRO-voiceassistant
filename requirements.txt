@@ -1,0 +1,12 @@
+livekit-agents[google]~=1.3
+livekit-plugins-noise-cancellation~=0.2
+streamlit
+PySide6
+numpy
+sounddevice
+speechrecognition
+python-dotenv
+pipwin
+pyaudio
+pyttsx3 
+screen-brightness-control
