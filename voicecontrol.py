@@ -98,24 +98,75 @@ apps = {
     "file explorer": "explorer.exe",
     "word": "winword.exe",
     "excel": "excel.exe",
-    "powerpoint": "powerpnt.exe"
+    "powerpoint": "powerpnt.exe",
+    "edge": r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+    "brave": r"C:\Program Files\BraveSoftware\Brave-Browser\Application\brave.exe",
+    "discord": r"C:\Users\aggai\AppData\Local\Discord\Update.exe --processStart Discord.exe",
+    "telegram": r"C:\Users\aggai\AppData\Roaming\Telegram Desktop\Telegram.exe",
+    "instagram": r"shell:AppsFolder\Facebook.InstagramBeta_8xx8rvfyw5nnt!App",
+    "pycharm": r"C:\Program Files\JetBrains\PyCharm Community Edition\bin\pycharm64.exe",
+    "android studio": r"C:\Program Files\Android\Android Studio\bin\studio64.exe",
+    "flutter": r"C:\src\flutter\bin\flutter.bat",
+    "antigravity": r"C:\Users\aggai\AppData\Local\Programs\antigravity\Antigravity.exe",
+    "vs code": r"D:\Microsoft VS Code\Code.exe",
+    "microsoft store": r"shell:AppsFolder\Microsoft.WindowsStore_8wekyb3d8bbwe!App",
+    "settings": "ms-settings:",
+    "clock": r"shell:AppsFolder\Microsoft.WindowsAlarms_8wekyb3d8bbwe!App",
+    "cloud": r"shell:AppsFolder\Microsoft.CloudExperienceHost_cw5n1h2txyewy!App",
 }
 
 def open_app(name):
     if name in apps:
         try:
-            if name == "file explorer":
-                subprocess.Popen(apps[name], shell=True)
+            path = apps[name]
+            if path.startswith("shell:") or path.startswith("ms-settings"):
+                import os
+                os.startfile(path)
+            elif name == "file explorer":
+                subprocess.Popen(path, shell=True)
+            elif " --" in path or " /" in path:
+                subprocess.Popen(path, shell=True)
             else:
-                subprocess.Popen(apps[name])
+                subprocess.Popen(path)
         except:
             pass
 
+# Map app names to their process names for closing
+close_process = {
+    "chrome": "chrome.exe",
+    "notepad": "notepad.exe",
+    "calculator": "Calculator.exe",
+    "paint": "mspaint.exe",
+    "command prompt": "cmd.exe",
+    "file explorer": "explorer.exe",
+    "word": "WINWORD.EXE",
+    "excel": "EXCEL.EXE",
+    "powerpoint": "POWERPNT.EXE",
+    "edge": "msedge.exe",
+    "brave": "brave.exe",
+    "discord": "Discord.exe",
+    "telegram": "Telegram.exe",
+    "instagram": "Instagram.exe",
+    "pycharm": "pycharm64.exe",
+    "android studio": "studio64.exe",
+    "antigravity": "Antigravity.exe",
+    "vs code": "Code.exe",
+    "clock": "Time.exe",
+    "settings": "SystemSettings.exe",
+    "microsoft store": "WinStore.App.exe",
+}
+
 def close_app(name):
-    if "chrome" in name.lower():
-        subprocess.run("taskkill /IM chrome.exe /F", shell=True, capture_output=True)
-    elif "notepad" in name.lower():
-        subprocess.run("taskkill /IM notepad.exe /F", shell=True, capture_output=True)
+    if name in close_process:
+        subprocess.run(f"taskkill /IM {close_process[name]} /F", shell=True, capture_output=True)
+
+def close_all_apps():
+    # Skip explorer.exe as it is critical for Windows desktop
+    skip = {"explorer.exe"}
+    for name, process in close_process.items():
+        if process.lower() not in skip:
+            subprocess.run(f"taskkill /IM {process} /F", shell=True, capture_output=True)
+    print("All apps closed.")
 
 # ---------------- MEDIA CONTROL ----------------
 def play_pause():
@@ -184,11 +235,14 @@ def run_voice():
                         open_app(app)
                         break
 
+            elif any(phrase in command for phrase in ["close all apps", "close all", "close everything"]):
+                close_all_apps()
+
             elif "close" in command:
-                if "chrome" in command:
-                    close_app("chrome")
-                elif "notepad" in command:
-                    close_app("notepad")
+                for app in close_process:
+                    if app in command:
+                        close_app(app)
+                        break
 
             # Media control
             elif any(phrase in command for phrase in ["play", "pause", "play pause"]):
